@@ -1,0 +1,69 @@
+openapi: "3.0.3"
+info:
+  version: 1.0.0
+  title: Swagger Logfile
+servers:
+  - url: http://localhost:8080/
+paths:
+  /log:
+    post:
+      summary: write a single string to a file.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Log'
+      responses:
+        '204':
+          description: Log file limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogError'
+        '400':
+          description: Wrong Input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogError'
+        default:
+          description: Written successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogError"
+components:
+  schemas:
+    Log:
+      type: object
+      required:
+        - logFile
+        - logLimit
+      properties:
+        logFile:
+          type: string
+          pattern: '^[\w]+\.log$'
+          nullable: false
+        logLimit:
+          type: integer
+          format: int32
+          nullable: false
+          minimum: 1
+    LogError:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  responses:
+    default:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LogError'
